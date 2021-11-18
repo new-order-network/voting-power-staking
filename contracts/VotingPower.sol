@@ -42,7 +42,7 @@ contract VotingPower is ReentrancyGuard, ISTAKING{
 
     /**
     * @dev initialize the contract
-    * @param token_ is the token that is staked to get voting power
+    * @param token_ is the token that is staked or locked to get voting power
     * @param scaling_ is an array of uint8 (bytes) percent voting power discounts for each epoch
     * @param epoch_ is the duration of one epoch in seconds
     **/
@@ -93,7 +93,7 @@ contract VotingPower is ReentrancyGuard, ISTAKING{
     }
 
     /**
-    * @dev Stakes a certain amount of tokens, this will attempt to transfer the given amount from the caller.
+    * @dev Stakes the specified `amount` of tokens, this will attempt to transfer the given amount from the caller.
     * It will count the actual number of tokens trasferred as being staked
     * MUST trigger Staked event.
     **/
@@ -111,9 +111,10 @@ contract VotingPower is ReentrancyGuard, ISTAKING{
     }
 
     /**
-    * @dev Stakes a certain `amount` of tokens on behalf of address `user`, 
+    * @dev Stakes the specified `amount` of tokens from `staker` on behalf of address `voter`, 
     * this will attempt to transfer the given amount from the caller.
-    * Must be called from an ISTAKINGPROXY contract that has been approved by `user`. 
+    * Must be called from an ISTAKINGPROXY contract that has been approved by `staker`.
+    * Tokens will be staked towards the voting power of address `voter` allowing one address to delegate voting power to another. 
     * It will count the actual number of tokens trasferred as being staked
     * MUST trigger Staked event.
     * Returns the number of tokens actually staked
@@ -133,7 +134,7 @@ contract VotingPower is ReentrancyGuard, ISTAKING{
         return transferred;
     }
     /**
-    * @dev Unstakes a certain amount of tokens, this SHOULD return the given amount of tokens to the caller, 
+    * @dev Unstakes the specified `amount` of tokens, this SHOULD return the given amount of tokens to the caller, 
     * MUST trigger Unstaked event.
     */
     function unstake(uint256 amount) external override nonReentrant{
@@ -147,9 +148,9 @@ contract VotingPower is ReentrancyGuard, ISTAKING{
     }
 
     /**
-    * @dev Unstakes a certain amount of tokens currently staked on behalf of address `user`, 
-    * this SHOULD return the given amount of tokens to the caller
-    * caller is responsible for returning tokens to `user` if applicable.
+    * @dev Unstakes the specified `amount` of tokens currently staked by `staker` on behalf of `voter`, 
+    * this SHOULD return the given amount of tokens to the calling contract
+    * calling contract is responsible for returning tokens to `staker` if applicable.
     * MUST trigger Unstaked event.
     */
     function unstakeFor(address voter, address staker, uint256 amount) external override nonReentrant{
@@ -164,17 +165,17 @@ contract VotingPower is ReentrancyGuard, ISTAKING{
     }
 
     /**
-    * @dev Returns the current total of tokens staked for address addr.
+    * @dev Returns the current total of tokens staked for address `addr`.
     */
     function totalStakedFor(address addr) external override view returns (uint256){
         return stakes[addr].totalStake;
     }
 
     /**
-    * @dev Returns the current tokens staked by address `delegate` for address `user`.
+    * @dev Returns the current tokens staked by address `staker` for address `voter`.
     */
-    function stakedFor(address user, address delegate) external override view returns (uint256){
-        return stakes[user].stakedAmount[delegate];
+    function stakedFor(address voter, address staker) external override view returns (uint256){
+        return stakes[voter].stakedAmount[staker];
     }
     /**
     * @dev Returns the number of current total tokens staked.
