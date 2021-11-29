@@ -24,7 +24,7 @@ struct Stake{
 */
 contract VotingPower is ReentrancyGuard, ISTAKING{
     //the token used for staking. Implements ILOCKER. It is trusted & known code.
-    IERC20 _token;
+    IERC20 immutable _token;
     //store the number of tokens staked by each address
     mapping (address => Stake) public stakes;
 
@@ -96,6 +96,7 @@ contract VotingPower is ReentrancyGuard, ISTAKING{
     * @dev Stakes the specified `amount` of tokens, this will attempt to transfer the given amount from the caller.
     * It will count the actual number of tokens trasferred as being staked
     * MUST trigger Staked event.
+    * Returns the number of tokens actually staked
     **/
     function stake(uint256 amount) external override nonReentrant returns (uint256){
         require(amount > 0, "Cannot Stake 0");

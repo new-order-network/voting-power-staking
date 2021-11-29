@@ -26,10 +26,11 @@ Returns the voting power for `who`
 who indicates the address whose votingPower to compute
 returns the voting power for who
     
-## function stake(uint256 amount) public nonReentrant
+## function stake(uint256 amount) external override nonReentrant returns (uint256)
 Stakes the specified `amount` of tokens, this will attempt to transfer the given amount from the caller.
 It will count the actual number of tokens trasferred as being staked
 MUST emit Staked event.
+Returns the number of tokens actually staked
 
 ## function stakeFor(address voter, address staker, uint256 amount) external override nonReentrant returns (uint256)
 Stakes the specified `amount` of tokens from `staker` on behalf of address `voter`,
